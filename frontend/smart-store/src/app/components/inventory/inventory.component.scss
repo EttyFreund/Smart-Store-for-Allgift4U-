@@ -1,0 +1,41 @@
+.inventory {
+  padding: 24px;
+  direction: rtl;
+
+  h2 {
+    margin-bottom: 16px;
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+
+    th, td {
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      text-align: right;
+    }
+
+    th {
+      background-color: #4a90e2;
+      color: white;
+    }
+
+    tr.missing td {
+      background-color: #ffe0e0;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      color: #c0392b;
+    }
+  }
+}

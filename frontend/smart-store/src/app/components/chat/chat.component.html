@@ -1,0 +1,65 @@
+<div class="chat-wrapper">
+  <div class="chat-box">
+
+    <div class="chat-header">
+      <div class="header-icon">🎁</div>
+      <div class="header-text">
+        <div class="title">All Gift</div>
+        <div class="subtitle">מערכת ניהול מלאי</div>
+      </div>
+      <div class="status">מחובר</div>
+    </div>
+
+    <div class="chat-messages">
+      <div *ngFor="let msg of messages" class="message" [class.user]="msg.role === 'user'" [class.bot]="msg.role === 'bot'">
+        <div class="avatar">{{ msg.role === 'bot' ? '🤖' : '👤' }}</div>
+        <div class="bubble">
+          <p>{{ msg.text }}</p>
+
+          <div class="order-result" *ngIf="msg.items && msg.items.length > 0">
+            <div class="order-item" *ngFor="let item of msg.items">
+              <span class="item-name">{{ item.productName }}</span>
+              <span class="item-qty">-{{ item.quantityRemoved }} יח'</span>
+              <span class="item-stock" [class.ok]="item.newQuantity > 0" [class.low]="item.newQuantity <= 0">
+                נשאר {{ item.newQuantity > 0 ? item.newQuantity : 0 }}
+              </span>
+              <span class="ai-badge" *ngIf="item.aiTriggered">AI הופעל — המלצת רכש נוצרה</span>
+            </div>
+          </div>
+
+          <div class="recommendations-section" *ngIf="msg.recommendations && msg.recommendations.length > 0">
+            <div class="rec-title">המלצות רכש שנוצרו</div>
+            <div class="rec-card" *ngFor="let rec of msg.recommendations">
+              <span class="rec-supplier">{{ rec.supplierName }}</span>
+              <span class="rec-price">₪{{ rec.price }}</span>
+              <span class="rec-url" *ngIf="rec.purchaseUrl">
+                <a [href]="rec.purchaseUrl" target="_blank">{{ rec.purchaseUrl }}</a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="message bot" *ngIf="loading">
+        <div class="avatar">🤖</div>
+        <div class="typing-bubble">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <input
+        id="chatInput"
+        name="chatInput"
+        type="text"
+        [(ngModel)]="input"
+        (keydown)="onEnter($event)"
+        placeholder="הקלידי שם הזמנה..."
+        [disabled]="loading"
+      />
+      <button type="button" (click)="send()" [disabled]="loading || !input.trim()">שלח</button>
+    </div>
+
+  </div>
+</div>

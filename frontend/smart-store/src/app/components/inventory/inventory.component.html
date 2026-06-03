@@ -1,0 +1,30 @@
+<div class="inventory">
+  <h2>מלאי חומרי גלם</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>שם מוצר</th>
+        <th>כמות נוכחית</th>
+        <th>כמות מינימום</th>
+        <th>סטטוס</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of products" [class.missing]="p.currentQuantity < p.minQuantity">
+        <td>{{ p.productName }}</td>
+        <td>{{ p.currentQuantity }}</td>
+        <td>{{ p.minQuantity }}</td>
+        <td>{{ p.currentQuantity < p.minQuantity ? '⚠️ חסר' : '✅ תקין' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>מוצרים חסרים</h2>
+  <p *ngIf="missingProducts.length === 0">אין מוצרים חסרים</p>
+  <ul>
+    <li *ngFor="let p of missingProducts">
+      {{ p.productName }} - נשאר {{ p.currentQuantity }} מתוך מינימום {{ p.minQuantity }}
+    </li>
+  </ul>
+</div>

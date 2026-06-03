@@ -1,0 +1,50 @@
+.order-container {
+  padding: 24px;
+  direction: rtl;
+  max-width: 500px;
+  margin: 0 auto;
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  .form {
+    display: flex;
+    gap: 12px;
+
+    input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .success {
+    margin-top: 16px;
+    color: green;
+    font-weight: bold;
+  }
+
+  .error {
+    margin-top: 16px;
+    color: red;
+    font-weight: bold;
+  }
+}

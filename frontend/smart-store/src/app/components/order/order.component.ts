@@ -8,7 +8,7 @@ import { InventoryOrderService } from '../../services/inventory-order.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './order.component.html',
-  styleUrl: './order.component.scss'
+  styleUrls: ['./order.component.scss']
 })
 export class OrderComponent {
   orderName = '';

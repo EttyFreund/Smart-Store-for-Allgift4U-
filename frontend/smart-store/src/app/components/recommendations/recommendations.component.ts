@@ -9,7 +9,7 @@ import { PurchaseRecommendation } from '../../models/models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './recommendations.component.html',
-  styleUrl: './recommendations.component.scss'
+  styleUrls: ['./recommendations.component.scss']
 })
 export class RecommendationsComponent implements OnInit {
   recommendations: PurchaseRecommendation[] = [];

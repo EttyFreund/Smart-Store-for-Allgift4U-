@@ -7,7 +7,7 @@ using SmartStore.DAL.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-var openAiApiKey = builder.Configuration["OpenAI:ApiKey"]!;
+var openAiApiKey = builder.Configuration["Groq:ApiKey"]!;
 
 builder.Services.AddDbContext<SmartStoreContext>(options =>
     options.UseSqlServer(connectionString));
@@ -28,6 +28,11 @@ builder.Services.AddControllers()
         o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 52428800; // 50MB
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

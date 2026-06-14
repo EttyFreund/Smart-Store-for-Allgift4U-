@@ -10,6 +10,8 @@ public class SmartStoreContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<AI_Log> AI_Logs { get; set; }
     public DbSet<PurchaseRecommendation> PurchaseRecommendations { get; set; }
+    public DbSet<OrderTemplate> OrderTemplates { get; set; }
+    public DbSet<OrderTemplateComponent> OrderTemplateComponents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +37,26 @@ public class SmartStoreContext : DbContext
              .WithMany(p => p.PurchaseRecommendations)
              .HasForeignKey(r => r.ProductID)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OrderTemplate>(e =>
+        {
+            e.HasKey(t => t.TemplateID);
+            e.ToTable("OrderTemplates");
+        });
+
+        modelBuilder.Entity<OrderTemplateComponent>(e =>
+        {
+            e.HasKey(c => new { c.TemplateID, c.ProductID });
+            e.ToTable("OrderTemplateComponents");
+            e.HasOne(c => c.Template)
+             .WithMany(t => t.Components)
+             .HasForeignKey(c => c.TemplateID)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(c => c.Product)
+             .WithMany()
+             .HasForeignKey(c => c.ProductID)
+             .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

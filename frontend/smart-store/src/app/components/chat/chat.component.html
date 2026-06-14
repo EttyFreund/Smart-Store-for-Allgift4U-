@@ -1,64 +1,141 @@
 <div class="chat-wrapper">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo-text">
+        <span class="logo-main">Allgift<span class="logo-4u">4U</span></span>
+      </div>
+      <div class="sidebar-subtitle">HISTORY </div>
+    </div>
+
+    <div class="sidebar-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="...הפש עובד או הזמנה" />
+    </div>
+
+    <!-- Active Staff -->
+    <div class="active-staff-section">
+      <div class="staff-item active">
+        <img class="staff-avatar-image" src="/person.png" alt="משתמש מחובר" />
+        <div class="staff-info">
+          <span class="staff-name">{{ auth.username }}</span>
+        </div>
+        <span class="online-badge"><span class="online-dot"></span>Online</span>
+      </div>
+    </div>
+
+    <!-- Conversation History -->
+    <div class="history-label">
+      <span>היסטוריית שיחות / Conversation History</span>
+    </div>
+
+    <div class="history-list">
+      <div *ngFor="let session of filteredSessions; trackBy: trackBySessionId"
+           class="history-item"
+           [class.active]="currentSessionId === session.id"
+           (click)="loadSession(session)">
+        <div class="history-avatar">{{ session.username[0].toUpperCase() }}</div>
+        <div class="history-text">
+          <span class="history-name">{{ session.username }}</span>
+          <span class="history-preview">{{ getLastMessage(session) }}</span>
+        </div>
+        <span class="history-time">{{ session.startedAt }}</span>
+      </div>
+      <div class="no-history" *ngIf="filteredSessions.length === 0">
+        <span>אין שיחות קודמות</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat box -->
   <div class="chat-box">
 
+    <!-- Header -->
     <div class="chat-header">
-      <div class="header-icon">🎁</div>
-      <div class="header-text">
-        <div class="title">All Gift</div>
-        <div class="subtitle">מערכת ניהול מלאי</div>
+      <div class="header-left">
+        <img class="header-avatar-image" src="/person.png" alt="משתמש" />
+        <div class="header-name">{{ auth.username }}</div>
       </div>
-      <div class="status">מחובר</div>
+      <div class="header-logo">Allgift<span class="logo-accent">4U</span></div>
     </div>
 
-    <div class="chat-messages">
-      <div *ngFor="let msg of messages" class="message" [class.user]="msg.role === 'user'" [class.bot]="msg.role === 'bot'">
-        <div class="avatar">{{ msg.role === 'bot' ? '🤖' : '👤' }}</div>
-        <div class="bubble">
-          <p>{{ msg.text }}</p>
+    <!-- Messages -->
+    <div class="chat-messages" #messagesContainer>
+      <div class="date-separator">Today</div>
 
-          <div class="order-result" *ngIf="msg.items && msg.items.length > 0">
-            <div class="order-item" *ngFor="let item of msg.items">
-              <span class="item-name">{{ item.productName }}</span>
-              <span class="item-qty">-{{ item.quantityRemoved }} יח'</span>
-              <span class="item-stock" [class.ok]="item.newQuantity > 0" [class.low]="item.newQuantity <= 0">
-                נשאר {{ item.newQuantity > 0 ? item.newQuantity : 0 }}
-              </span>
-              <span class="ai-badge" *ngIf="item.aiTriggered">AI הופעל — המלצת רכש נוצרה</span>
-            </div>
-          </div>
+      <!-- Dynamic Messages -->
+      <div *ngFor="let msg of messages; let i = index" 
+           class="message" 
+           [class.user]="msg.role === 'user'"
+           [class.bot]="msg.role === 'bot'">
+        <div class="avatar">
+          <img *ngIf="msg.role === 'bot'" src="/robot.png" alt="רובוט" />
+          <img *ngIf="msg.role === 'user'" src="/person.png" alt="משתמש" />
+        </div>
+        <div class="bubble-wrap">
+            <div class="bubble">
+              <p>{{ msg.text }}</p>
 
-          <div class="recommendations-section" *ngIf="msg.recommendations && msg.recommendations.length > 0">
-            <div class="rec-title">המלצות רכש שנוצרו</div>
-            <div class="rec-card" *ngFor="let rec of msg.recommendations">
-              <span class="rec-supplier">{{ rec.supplierName }}</span>
-              <span class="rec-price">₪{{ rec.price }}</span>
-              <span class="rec-url" *ngIf="rec.purchaseUrl">
-                <a [href]="rec.purchaseUrl" target="_blank">{{ rec.purchaseUrl }}</a>
-              </span>
+              <button
+                type="button"
+                class="delivery-note-btn"
+                *ngIf="msg.deliveryNotePdf"
+                (click)="downloadDeliveryNote(msg)">
+                <span>📄</span>
+                הורד תעודת משלוח
+              </button>
+
+              <span class="msg-time">{{ msg.timestamp }}</span>
             </div>
-          </div>
+
         </div>
       </div>
 
+      <!-- Loading Indicator -->
       <div class="message bot" *ngIf="loading">
-        <div class="avatar">🤖</div>
-        <div class="typing-bubble">
-          <span></span><span></span><span></span>
+        <div class="avatar"><img src="/robot.png" alt="רובוט" /></div>
+        <div class="bubble-wrap">
+          <div class="typing-bubble">
+            <span></span><span></span><span></span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="chat-input">
-      <input
-        id="chatInput"
-        name="chatInput"
-        type="text"
+    <!-- Image Preview -->
+    <div class="image-preview-bar" *ngIf="imagePreview">
+      <img [src]="imagePreview" alt="Preview" />
+      <span>תמונה מוכנה לשליחה</span>
+      <button type="button" class="remove-img" (click)="clearImage()">✕</button>
+    </div>
+
+    <!-- Chat Input Area -->
+    <div class="chat-input-area">
+      <input #imgFileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display:none" />
+      
+      <div class="input-left">
+        <button type="button" class="action-btn" (click)="toggleInputEmoji($event)" title="Emoji" [disabled]="loading">😊</button>
+        <button type="button" class="action-btn" (click)="imgFileInput.click()" title="Attachment" [disabled]="loading">📎</button>
+        <button type="button" class="action-btn" (click)="imgFileInput.click()" title="Image" [disabled]="loading">🖼️</button>
+        
+        <!-- Emoji Picker -->
+        <div class="emoji-picker input-emoji-picker" *ngIf="showInputEmoji" (click)="$event.stopPropagation()">
+          <span *ngFor="let e of emojiList" class="emoji-item" (click)="addEmojiToInput(e)">{{ e }}</span>
+        </div>
+      </div>
+      
+      <input 
+        type="text" 
+        class="text-input" 
         [(ngModel)]="input"
         (keydown)="onEnter($event)"
-        placeholder="הקלידי שם הזמנה..."
-        [disabled]="loading"
-      />
-      <button type="button" (click)="send()" [disabled]="loading || !input.trim()">שלח</button>
+        [placeholder]="imagePreview ? 'הוסף תיאור...' : 'שם הזמנה לעיבוד...'"
+        [disabled]="loading" />
+      
+      <div class="input-right">
+        <button type="button" class="action-btn send-btn" (click)="send()" [disabled]="loading || (!input.trim() && !imagePreview)">שלח</button>
+      </div>
     </div>
 
   </div>
